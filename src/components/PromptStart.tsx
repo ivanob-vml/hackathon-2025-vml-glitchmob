@@ -12,7 +12,6 @@ const PromptStart: React.FC<PromptStartProps> = ({ onPromptClick }) => {
   ];     
   return (
       <div id="prompts" className="flex flex-wrap justify-start items-center flex-row gap-2 px-4 animate-fadeOut">
-      <p className="flex flex-col text-[#000000] font-['Figtree']">Select a prompt:</p><br/>
       <div className="flex gap-2.5 flex-wrap">
         {promptStrings.map((prompt, index) => (
           <div

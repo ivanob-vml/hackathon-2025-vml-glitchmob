@@ -47,13 +47,13 @@ const DrinkPage: React.FC<DrinkPageProps> = ({
                   </div>}
                     {
                     <div
-                        className="flex justify-start items-center flex-col gap-3 pt-[24px] relative">
+                        className="flex justify-start items-center flex-col gap-3 pt-[24px]">
                         <div
                         className="flex justify-start items-start flex-col bg-[#80506B] rounded-2xl shadow-[_0px_8px_16px_0px_rgba(0,0,0,0.12)] w-[327px] h-[600px]">
                         <div
-                          className="flex justify-start items-center flex-row gap-2.5 p-1 w-[326px] h-[335px] relative"
+                          className="flex justify-start items-center flex-row gap-2.5 p-3 w-[326px] h-[335px]"
                           style={{width: '326px'}}>
-                          <img
+                          <img className="flex-1 rounded-xl w-[318px] h-[328px]"
                             src={drinkJson.image}
                             style={{ width: '318px'}} />
                           <div
@@ -153,9 +153,9 @@ const DrinkPage: React.FC<DrinkPageProps> = ({
                                   {drinkJson.name}
                                 </p>
                               </div>
-
-
-{drinkJson.ingredients}
+                                <span className="text-[#FFFFFF] font-['TCCC-UnityText']">
+                                {drinkJson.ingredients.join(', ')}
+                                </span>
                             </div>
                             <div
                               className="flex self-stretch justify-start items-start flex-row gap-2.5">

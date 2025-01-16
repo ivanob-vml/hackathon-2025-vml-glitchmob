@@ -85,6 +85,7 @@ const GeneratingDrink: React.FC = () => {
       // Prepare request body for Stable Diffusion model
       const body = {
         prompt: prompt,
+        negative_prompt: 'no text, no letters, no numbers, no words, no watermark, no signature, no captions, no subtitles, no signs, no billboards, no graffiti, no complex background, no detailed background, no distracting background, blurred background, out of focus background',
         mode: "text-to-image",
       };
   
@@ -168,7 +169,7 @@ const GeneratingDrink: React.FC = () => {
                   </svg>
                   </div>}
                     {
-                        <div className="flex justify-start items-center flex-col gap-[19px]">
+                        <div className="flex justify-start items-center p-10 flex-col gap-[19px]">
                             <img
                                 src={sparkleGif}
                                 className="w-[100px] h-[104px]" />

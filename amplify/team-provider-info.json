@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-glitchmob-dev-4dcb0-authRole",
+      "UnauthRoleArn": "arn:aws:iam::363412462232:role/amplify-glitchmob-dev-4dcb0-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::363412462232:role/amplify-glitchmob-dev-4dcb0-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-glitchmob-dev-4dcb0-deployment",
+      "UnauthRoleName": "amplify-glitchmob-dev-4dcb0-unauthRole",
+      "StackName": "amplify-glitchmob-dev-4dcb0",
+      "StackId": "arn:aws:cloudformation:us-east-1:363412462232:stack/amplify-glitchmob-dev-4dcb0/8d80b620-d3ec-11ef-9ea5-12748b0ccb1d",
+      "AmplifyAppId": "d21qb513tis9ko"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d21qb513tis9ko",
+          "type": "manual"
+        }
+      }
+    }
+  }
+}

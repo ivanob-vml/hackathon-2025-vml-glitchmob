@@ -16,3 +16,17 @@
         transform: scale(1) rotate(360deg);
     }
 }
+
+  @font-face {
+    font-family: 'Figtree';
+    src: url('./assets/fonts/Figtree-VariableFont_wght.ttf') format('truetype');
+  }
+  
+  @font-face {
+    font-family: 'Inter';
+    src: url('./assets/fonts/Figtree-VariableFont_wght.ttf') format('truetype');
+  }
+  
+  body {
+    font-family: 'Figtree', sans-serif;
+  }

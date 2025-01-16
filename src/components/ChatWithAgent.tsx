@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime";
 import { MessageSquare, Send, Bot } from 'lucide-react';
+import { BiSolidDrink } from 'react-icons/bi';
 import Message from './Message';
 import WelcomeComponent from './WelcomeComponent';
 import PromptStart from './PromptStart';
@@ -11,11 +12,12 @@ type Message = {
 };
 
 const ChatWithAgent: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Hey, how are you?", isBot: true }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputBoxRef = useRef<HTMLDivElement>(null);
+  const generateBtnRef = useRef<HTMLDivElement>(null);
 
   // Initialize the Bedrock Agent Runtime client
   const client = new BedrockAgentRuntimeClient({ 
@@ -57,7 +59,6 @@ const userSessionId = useState<string>(() => {
             fullResponse += new TextDecoder().decode(chunk.chunk.bytes);
           }
         }
-        
         return fullResponse;
       }
       
@@ -81,6 +82,11 @@ const userSessionId = useState<string>(() => {
       try {
         // Get response from Bedrock agent
         const agentResponse = await invokeAgent(userMessage);
+        
+        if (agentResponse.indexOf('Generate Drink') !== -1) {
+            inputBoxRef.current?.classList.add('hidden');
+            generateBtnRef.current?.classList.remove('hidden');
+        }
 
         // Add agent response to chat
         setMessages(prev => [...prev, { text: agentResponse, isBot: true }]);
@@ -93,6 +99,7 @@ const userSessionId = useState<string>(() => {
       }
 
       setIsLoading(false);
+      messagesEndRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
     }
   };
 
@@ -141,7 +148,7 @@ const userSessionId = useState<string>(() => {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 <WelcomeComponent/>
-                <PromptStart/>
+                <PromptStart onPromptClick={handleMessageSend}/>
                 {messages.map((message, index) => (
                 <div
                   key={index}
@@ -154,32 +161,42 @@ const userSessionId = useState<string>(() => {
                     />
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}
-            <div className="p-2.5">
-            <div className="flex justify-center items-center flex-row gap-3 p-2.5 bg-[#F4F4F4] border-solid border-[#EFEFEF] border rounded-[30px]">
-            <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                    d="M10 13.75C10.9942 13.749 11.9475 13.3535 12.6505 12.6505C13.3535 11.9475 13.749 10.9942 13.75 10V5C13.75 4.00544 13.3549 3.05161 12.6517 2.34835C11.9484 1.64509 10.9946 1.25 10 1.25C9.00544 1.25 8.05161 1.64509 7.34835 2.34835C6.64509 3.05161 6.25 4.00544 6.25 5V10C6.25103 10.9942 6.64645 11.9475 7.34949 12.6505C8.05253 13.3535 9.00576 13.749 10 13.75ZM7.5 5C7.5 4.33696 7.76339 3.70107 8.23223 3.23223C8.70107 2.76339 9.33696 2.5 10 2.5C10.663 2.5 11.2989 2.76339 11.7678 3.23223C12.2366 3.70107 12.5 4.33696 12.5 5V10C12.5 10.663 12.2366 11.2989 11.7678 11.7678C11.2989 12.2366 10.663 12.5 10 12.5C9.33696 12.5 8.70107 12.2366 8.23223 11.7678C7.76339 11.2989 7.5 10.663 7.5 10V5ZM10.625 16.2188V18.75C10.625 18.9158 10.5592 19.0747 10.4419 19.1919C10.3247 19.3092 10.1658 19.375 10 19.375C9.83424 19.375 9.67527 19.3092 9.55806 19.1919C9.44085 19.0747 9.375 18.9158 9.375 18.75V16.2188C7.8341 16.062 6.40607 15.3393 5.36707 14.1907C4.32806 13.042 3.7519 11.5489 3.75 10C3.75 9.83424 3.81585 9.67527 3.93306 9.55806C4.05027 9.44085 4.20924 9.375 4.375 9.375C4.54076 9.375 4.69973 9.44085 4.81694 9.55806C4.93415 9.67527 5 9.83424 5 10C5 11.3261 5.52678 12.5979 6.46447 13.5355C7.40215 14.4732 8.67392 15 10 15C11.3261 15 12.5979 14.4732 13.5355 13.5355C14.4732 12.5979 15 11.3261 15 10C15 9.83424 15.0658 9.67527 15.1831 9.55806C15.3003 9.44085 15.4592 9.375 15.625 9.375C15.7908 9.375 15.9497 9.44085 16.0669 9.55806C16.1842 9.67527 16.25 9.83424 16.25 10C16.2481 11.5489 15.6719 13.042 14.6329 14.1907C13.5939 15.3393 12.1659 16.062 10.625 16.2188Z"
-                    fill="black" />
-                </svg>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Type your message..."
-                  className="flex-1 text-[#000000] font-['Figtree'] text-center bg-transparent"
-                  disabled={isLoading}
-                />
+            <div ref={inputBoxRef} className="p-2.5">
+                <div className="flex justify-center items-center flex-row gap-3 p-2.5 bg-[#F4F4F4] border-solid border-[#EFEFEF] border rounded-[30px]">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                        d="M10 13.75C10.9942 13.749 11.9475 13.3535 12.6505 12.6505C13.3535 11.9475 13.749 10.9942 13.75 10V5C13.75 4.00544 13.3549 3.05161 12.6517 2.34835C11.9484 1.64509 10.9946 1.25 10 1.25C9.00544 1.25 8.05161 1.64509 7.34835 2.34835C6.64509 3.05161 6.25 4.00544 6.25 5V10C6.25103 10.9942 6.64645 11.9475 7.34949 12.6505C8.05253 13.3535 9.00576 13.749 10 13.75ZM7.5 5C7.5 4.33696 7.76339 3.70107 8.23223 3.23223C8.70107 2.76339 9.33696 2.5 10 2.5C10.663 2.5 11.2989 2.76339 11.7678 3.23223C12.2366 3.70107 12.5 4.33696 12.5 5V10C12.5 10.663 12.2366 11.2989 11.7678 11.7678C11.2989 12.2366 10.663 12.5 10 12.5C9.33696 12.5 8.70107 12.2366 8.23223 11.7678C7.76339 11.2989 7.5 10.663 7.5 10V5ZM10.625 16.2188V18.75C10.625 18.9158 10.5592 19.0747 10.4419 19.1919C10.3247 19.3092 10.1658 19.375 10 19.375C9.83424 19.375 9.67527 19.3092 9.55806 19.1919C9.44085 19.0747 9.375 18.9158 9.375 18.75V16.2188C7.8341 16.062 6.40607 15.3393 5.36707 14.1907C4.32806 13.042 3.7519 11.5489 3.75 10C3.75 9.83424 3.81585 9.67527 3.93306 9.55806C4.05027 9.44085 4.20924 9.375 4.375 9.375C4.54076 9.375 4.69973 9.44085 4.81694 9.55806C4.93415 9.67527 5 9.83424 5 10C5 11.3261 5.52678 12.5979 6.46447 13.5355C7.40215 14.4732 8.67392 15 10 15C11.3261 15 12.5979 14.4732 13.5355 13.5355C14.4732 12.5979 15 11.3261 15 10C15 9.83424 15.0658 9.67527 15.1831 9.55806C15.3003 9.44085 15.4592 9.375 15.625 9.375C15.7908 9.375 15.9497 9.44085 16.0669 9.55806C16.1842 9.67527 16.25 9.83424 16.25 10C16.2481 11.5489 15.6719 13.042 14.6329 14.1907C13.5939 15.3393 12.1659 16.062 10.625 16.2188Z"
+                        fill="black" />
+                    </svg>
+                    <BiSolidDrink className="loaderIcon" visibility={isLoading ? 'visible': 'hidden'}/>
+                    <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    placeholder="Type your message..."
+                    className="flex-1 text-[#000000] font-['Figtree'] text-center bg-transparent"
+                    disabled={isLoading}
+                    />
+                </div>
             </div>
-            </div>
+            {/* Generate Button */}
+            <div
+                ref={generateBtnRef}
+                className="flex hidden justify-start items-center flex-col gap-2.5 py-2 px-[20px] bg-[#FFFFFF] border-solid border-[#4927AF] border-2 rounded-lg">
+                <span className="text-[#4927AF] font-['Inter'] text-center font-bold">
+                    Generate Drink
+                </span>
+                </div>
           </div>
         </div>
       </div>

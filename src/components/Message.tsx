@@ -4,17 +4,13 @@ import { MessageSquare } from 'lucide-react';
 interface MessageProps {
   isBot: boolean;
   text: string;
-  timestamp?: string;
   className?: string;
-  avatar?: string;
 }
 
 const Message: React.FC<MessageProps> = ({ 
   isBot, 
   text, 
-  timestamp, 
-  className = '',
-  avatar
+  className = ''
 }) => {
   return (
     <div
@@ -22,26 +18,6 @@ const Message: React.FC<MessageProps> = ({
         isBot ? 'bg-gray-100 text-gray-800' : 'bg-[#4927AF] text-white'
       } ${className}`}
     >
-      {/* <div className="flex items-start space-x-2">
-        {isBot && (
-          avatar ? (
-            <img 
-              src={avatar} 
-              alt="Bot Avatar" 
-              className="w-5 h-5 rounded-full mt-1" 
-            />
-          ) : (
-            <MessageSquare className="w-5 h-5 mt-1" />
-          )
-        )}
-        <div>
-          <p>{text}</p>
-          {timestamp && (
-            <span className="text-xs opacity-70 mt-1 block">
-              {timestamp}
-            </span>
-          )}
-        </div> */}
         
         {isBot && <div
             className="flex self-stretch justify-start items-start flex-row gap-2.5 bg-[#F4F4F4] rounded-lg items-center ">

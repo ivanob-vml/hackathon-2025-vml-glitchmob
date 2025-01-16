@@ -18,7 +18,7 @@ const WelcomeComponent: React.FC = () => {
       </svg>
       <p
         className="self-stretch text-[#000000] text-2xl font-['Inter'] text-center font-bold">
-        Describe Your Drink
+        'Ello me old china!. What brings ya here today?
       </p>
     </div>
   );

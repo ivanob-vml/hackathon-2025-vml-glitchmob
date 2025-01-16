@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import sparkleGif from '../assets/images/sparkle.gif';
 import { BedrockAgentRuntimeClient, InvokeAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime";
+import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import DrinkPage from './DrinkPage';
 
 const GeneratingDrink: React.FC = () => {
@@ -67,10 +68,59 @@ const GeneratingDrink: React.FC = () => {
     }
   };
   
+   // Function to call Amazon Bedrock Runtime to generate an image from a prompt
+  async function generateImageWithBedrock(prompt: string): Promise<string> {
+    // Import AWS SDK
+  
+    // Initialize Bedrock client
+    const client = new BedrockRuntimeClient({ 
+      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || ''
+      }
+    });
+  
+    try {
+      // Prepare request body for Stable Diffusion model
+      const body = {
+        prompt: prompt,
+        mode: "text-to-image",
+      };
+  
+      // Create command input
+      const input = {
+        modelId: "stability.stable-image-ultra-v1:0",
+        contentType: "application/json",
+        body: JSON.stringify(body)
+      };
+  
+      // Invoke model
+      const command = new InvokeModelCommand(input);
+      const response = await client.send(command);
+  
+      // Parse response and get base64 image
+      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+      console.log("Image Response",responseBody);
+      const base64Image = responseBody.images[0];
+  
+      return `data:image/png;base64,${base64Image}`;
+  
+    } catch (error) {
+      console.error("Error generating image:", error);
+      throw error;
+    }
+  }   
+  
   React.useEffect(() => {
     const fetchSummary = async () => {
       const summary = await callIntroAgent("Summarise the drink using key words, less than 100 words \"GiveMeDrink\". Respond with no drink name.");
-      setDrinkRecomendation( await callDrinkAgent(summary));
+      const drink = await callDrinkAgent(summary);
+      const drinkImage = await generateImageWithBedrock(drink);
+      setDrinkRecomendation(JSON.stringify({
+        ...JSON.parse(drink),
+        image: drinkImage
+      }));
       setShowDrink(true);
     };
     if (!showDrink) {

@@ -8,64 +8,9 @@ interface DrinkPageProps {
 const DrinkPage: React.FC<DrinkPageProps> = ({ 
     drink
 })=> {
-    const [imageSrc, setImageSrc] = useState<string>('');
     const drinkJson = JSON.parse(drink);
 
-    useEffect(() => {
-        
-        generateImageWithBedrock(drink).then((img) => {
-            console.log(img)
-            setImageSrc(img)
-        }).catch(console.error);
-        
-    }, [drink]);
     console.log(drinkJson);
-    console.log(imageSrc);
-      
-    // Function to call Amazon Bedrock Runtime to generate an image from a prompt
-async function generateImageWithBedrock(prompt: string): Promise<string> {
-  // Import AWS SDK
-
-  // Initialize Bedrock client
-  const client = new BedrockRuntimeClient({ 
-    region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
-    credentials: {
-      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || '',
-      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || ''
-    }
-  });
-
-  try {
-    // Prepare request body for Stable Diffusion model
-    const body = {
-      prompt: prompt,
-      mode: "text-to-image",
-    };
-
-    // Create command input
-    const input = {
-      modelId: "stability.stable-image-ultra-v1:0",
-      contentType: "application/json",
-      body: JSON.stringify(body)
-    };
-
-    // Invoke model
-    const command = new InvokeModelCommand(input);
-    const response = await client.send(command);
-
-    // Parse response and get base64 image
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-    console.log("Image Response",responseBody);
-    const base64Image = responseBody.images[0];
-
-    return `data:image/png;base64,${base64Image}`;
-
-  } catch (error) {
-    console.error("Error generating image:", error);
-    throw error;
-  }
-}        
-
     
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -109,7 +54,7 @@ async function generateImageWithBedrock(prompt: string): Promise<string> {
                           className="flex justify-start items-center flex-row gap-2.5 p-1 w-[326px] h-[335px] relative"
                           style={{width: '326px'}}>
                           <img
-                            src={imageSrc}
+                            src={drinkJson.image}
                             style={{ width: '318px'}} />
                           <div
                             className="absolute"
